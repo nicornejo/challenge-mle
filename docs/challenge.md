@@ -34,3 +34,9 @@ The **best model for production** is:
 **XGBoost trained with the Top 10 features and with class balancing.**
 
 This model strikes the right balance by **maximizing the detection of delays (high recall for the minority class)** while maintaining reasonable overall performance.
+
+## CI/CD and Deployment Decisions
+
+Instead of maintaining separate `ci.yml` and `cd.yml` files with GitHub Actions, the pipeline was implemented directly in **Cloud Build** using a single `cloudbuild.yaml`.  
+
+This choice keeps everything inside GCP, simplifies the workflow (tests + build + deploy in one place), and avoids managing extra secrets between GitHub and Google Cloud. It also makes the pipeline consistent with the same `make` commands used locally.

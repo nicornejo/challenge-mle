@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtualenv
+.venv/
+
+# Tests / coverage
+.pytest_cache/
+.coverage
+reports/
+
+# IDE
+.vscode/
+.idea/
+.DS_Store

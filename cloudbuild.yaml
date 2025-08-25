@@ -1,8 +1,8 @@
 # cloudbuild.yaml
 steps:
   - name: gcr.io/cloud-builders/docker
-    args: ["build", "-t", "REGION-docker.pkg.dev/PROJECT/REPO/IMAGE:TAG", "."]
+    args: ["build", "-t", "southamerica-west1-docker.pkg.dev/speedy-lattice-470101-g9/challenge-ml", "."]
 images:
-  - REGION-docker.pkg.dev/PROJECT/REPO/IMAGE:TAG
+  - southamerica-west1-docker.pkg.dev/speedy-lattice-470101-g9/challenge-ml
 options:
   logging: CLOUD_LOGGING_ONLY

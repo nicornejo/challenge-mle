@@ -1,7 +1,59 @@
-name: 'Continuous Delivery'
+name: CD
 
 on:
-  ...
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  REGION: southamerica-west1
+  PROJECT_ID: speedy-lattice-470101-g9
+  AR_REPO: challenge-ml
+  IMAGE: api
+  SERVICE: api
 
 jobs:
-  ...
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Auth to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_ID_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker to use Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Build image
+        run: |
+          IMAGE_URI="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.IMAGE }}:${{ github.sha }}"
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+          docker build -t "$IMAGE_URI" .
+
+      - name: Push image
+        run: docker push "$IMAGE_URI"
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy "${{ env.SERVICE }}" \
+            --image="$IMAGE_URI" \
+            --region="${{ env.REGION }}" \
+            --platform=managed \
+            --allow-unauthenticated \
+            --port=8080
+      - name: Show service URL
+        run: gcloud run services describe "${{ env.SERVICE }}" --region="${{ env.REGION }}" --format='value(status.url)'

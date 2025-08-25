@@ -1,8 +1,18 @@
-# cloudbuild.yaml
 steps:
   - name: gcr.io/cloud-builders/docker
-    args: ["build", "-t", "southamerica-west1-docker.pkg.dev/speedy-lattice-470101-g9/challenge-ml", "."]
+    args:
+      - "build"
+      - "-t"
+      - "southamerica-west1-docker.pkg.dev/speedy-lattice-470101-g9/challenge-ml/api:$SHORT_SHA"
+      - "."
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - "push"
+      - "southamerica-west1-docker.pkg.dev/speedy-lattice-470101-g9/challenge-ml/api:$SHORT_SHA"
+
 images:
-  - southamerica-west1-docker.pkg.dev/speedy-lattice-470101-g9/challenge-ml
+  - "southamerica-west1-docker.pkg.dev/speedy-lattice-470101-g9/challenge-ml/api:$SHORT_SHA"
+
 options:
   logging: CLOUD_LOGGING_ONLY
